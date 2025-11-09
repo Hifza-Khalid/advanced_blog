@@ -120,7 +120,4 @@ LOGIN_URL = 'login'
 
 # Custom user model (optional for future expansion)
 # AUTH_USER_MODEL = 'accounts.CustomUser'
-<<<<<<< HEAD
-=======
 
->>>>>>> 5d0e994 (Made changes to settings/code)
