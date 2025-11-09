@@ -110,7 +110,7 @@ CKEDITOR_CONFIGS = {
         'width': '100%',
     },
 }
-ALLOWED_HOSTS = ['hifzakhalid.pythonanywhere.com']
+ALLOWED_HOSTS = ['HifzaKhalid.pythonanywhere.com']
 
 # Authentication
 LOGIN_REDIRECT_URL = 'home'
