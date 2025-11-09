@@ -7,10 +7,8 @@ SECRET_KEY = 'django-insecure-your-secret-key-here'
 
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    'hifzakhalid.pythonanywhere.com',
-    'HifzaKhalid.pythonanywhere.com',
-]
+ALLOWED_HOSTS = ['hifzakhalid.pythonanywhere.com', 'www.hifzakhalid.pythonanywhere.com']
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
