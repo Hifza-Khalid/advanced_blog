@@ -7,7 +7,10 @@ SECRET_KEY = 'django-insecure-your-secret-key-here'
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'hifzakhalid.pythonanywhere.com',
+    'HifzaKhalid.pythonanywhere.com',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -110,10 +113,7 @@ CKEDITOR_CONFIGS = {
         'width': '100%',
     },
 }
-ALLOWED_HOSTS = [
-    'hifzakhalid.pythonanywhere.com',
-    'HifzaKhalid.pythonanywhere.com',
-]
+
 
 # Authentication
 LOGIN_REDIRECT_URL = 'home'
