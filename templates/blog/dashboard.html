@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Advanced Blog{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        {% if user.is_staff or user.groups.all.0.name == 'Authors' %}
+        <h1>Author Dashboard</h1>
+        <p class="lead">Manage your blog posts and track your activity.</p>
+        {% else %}
+        <h1>Reader Dashboard</h1>
+        <p class="lead">Welcome to your reader dashboard!</p>
+        {% endif %}
+    </div>
+</div>
+
+{% if user.is_staff or user.groups.all.0.name == 'Authors' %}
+<!-- Author Dashboard -->
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Total Posts</h5>
+                <h2 class="display-4">{{ total_posts }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Published</h5>
+                <h2 class="display-4">{{ published_posts.count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">Drafts</h5>
+                <h2 class="display-4">{{ draft_posts.count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Comments</h5>
+                <h2 class="display-4">{{ user_comments.count }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+            <a href="{% url 'post_create' %}" class="btn btn-primary me-md-2">
+                <i class="fas fa-plus"></i> Create New Post
+            </a>
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-eye"></i> View Public Blog
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Posts Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Your Posts</h5>
+            </div>
+            <div class="card-body">
+                {% if user_posts %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for post in user_posts %}
+                            <tr>
+                                <td>
+                                    <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                                </td>
+                                <td>{{ post.category.name }}</td>
+                                <td>
+                                    <span class="badge {% if post.status == 'published' %}bg-success{% else %}bg-warning{% endif %}">
+                                        {{ post.status|title }}
+                                    </span>
+                                </td>
+                                <td>{{ post.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <a href="{{ post.get_absolute_url }}" class="btn btn-sm btn-outline-info" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'post_edit' post.slug %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'post_delete' post.slug %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <h5>No posts yet</h5>
+                    <p class="text-muted">You haven't created any posts yet.</p>
+                    <a href="{% url 'post_create' %}" class="btn btn-primary">Create Your First Post</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Published Posts</h5>
+            </div>
+            <div class="card-body">
+                {% if published_posts %}
+                <div class="list-group">
+                    {% for post in published_posts|slice:":5" %}
+                    <a href="{{ post.get_absolute_url }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ post.title }}</h6>
+                            <small>{{ post.created_at|timesince }} ago</small>
+                        </div>
+                        <p class="mb-1">{{ post.content|striptags|truncatewords:10 }}</p>
+                        <small class="text-muted">Category: {{ post.category.name }}</small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No published posts yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Draft Posts</h5>
+            </div>
+            <div class="card-body">
+                {% if draft_posts %}
+                <div class="list-group">
+                    {% for post in draft_posts|slice:":5" %}
+                    <a href="{% url 'post_edit' post.slug %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ post.title }}</h6>
+                            <small>{{ post.created_at|timesince }} ago</small>
+                        </div>
+                        <p class="mb-1">{{ post.content|striptags|truncatewords:10 }}</p>
+                        <small class="text-muted">Click to edit and publish</small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No draft posts.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<!-- Reader Dashboard -->
+<!-- Calculate comment stats in the view and pass them to template -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Your Comments</h5>
+                <h2 class="display-4">{{ user_comments.count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Approved</h5>
+                <h2 class="display-4">{{ approved_comments_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">Pending</h5>
+                <h2 class="display-4">{{ pending_comments_count }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Your Comments</h5>
+            </div>
+            <div class="card-body">
+                {% if user_comments %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Post</th>
+                                <th>Comment</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for comment in user_comments %}
+                            <tr>
+                                <td>
+                                    <a href="{{ comment.post.get_absolute_url }}">{{ comment.post.title }}</a>
+                                </td>
+                                <td>{{ comment.content|truncatewords:15 }}</td>
+                                <td>{{ comment.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if comment.is_approved %}
+                                    <span class="badge bg-success">Approved</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">Pending</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <h5>No comments yet</h5>
+                    <p class="text-muted">You haven't made any comments yet.</p>
+                    <a href="{% url 'home' %}" class="btn btn-primary">Browse Posts</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for comment in user_comments|slice:":10" %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">
+                                You commented on 
+                                <a href="{{ comment.post.get_absolute_url }}">"{{ comment.post.title }}"</a>
+                            </h6>
+                            <small>{{ comment.created_at|timesince }} ago</small>
+                        </div>
+                        <p class="mb-1">{{ comment.content }}</p>
+                        <small class="text-muted">
+                            Status: 
+                            {% if comment.is_approved %}
+                            <span class="text-success">Approved</span>
+                            {% else %}
+                            <span class="text-warning">Pending approval</span>
+                            {% endif %}
+                        </small>
+                    </div>
+                    {% empty %}
+                    <div class="list-group-item text-center text-muted">
+                        No recent activity
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

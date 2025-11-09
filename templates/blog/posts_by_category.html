@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Posts in {{ category.name }} - Advanced Blog{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                <li class="breadcrumb-item active">{{ category.name }}</li>
+            </ol>
+        </nav>
+        <h1>Posts in "{{ category.name }}"</h1>
+        <p class="lead">{{ posts.paginator.count }} post{{ posts.paginator.count|pluralize }} found</p>
+    </div>
+</div>
+
+{% include 'blog/post_list.html' %}
+{% endblock %}
